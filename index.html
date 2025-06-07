@@ -2,88 +2,122 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>The Chemistry of LiOV</title>
+  <title>Chemistry of Love</title>
   <style>
     body {
-      background: linear-gradient(to right, #f8f9fa, #e0e7ff);
       font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
       text-align: center;
+      padding: 40px;
+      background: #f0f0f0;
     }
 
     h1 {
-      font-size: 2.5em;
-      margin-bottom: 20px;
-    }
-
-    .elements {
       font-size: 2em;
-      display: flex;
-      gap: 20px;
       margin-bottom: 20px;
     }
 
-    .element {
-      background: white;
+    .elements, .slots {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .card {
+      background: #ffffff;
       border: 2px solid #ccc;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      width: 80px;
-      transition: transform 0.3s ease;
-    }
-
-    .element:hover {
-      transform: scale(1.1);
-    }
-
-    button {
-      background: #6c63ff;
-      color: white;
-      padding: 10px 20px;
-      font-size: 1em;
-      border: none;
       border-radius: 8px;
-      cursor: pointer;
-      margin-top: 10px;
+      padding: 20px;
+      width: 60px;
+      text-align: center;
+      cursor: grab;
+      font-weight: bold;
+      font-size: 20px;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
     }
 
-    .reveal {
-      margin-top: 30px;
-      font-size: 1.8em;
-      color: #ff4081;
-      opacity: 0;
-      transition: opacity 0.6s ease;
+    .slot {
+      width: 60px;
+      height: 60px;
+      background: #e8e8e8;
+      border: 2px dashed #aaa;
+      border-radius: 8px;
     }
 
-    .reveal.show {
-      opacity: 1;
+    .slot.filled {
+      border-style: solid;
+      background: #d0ffd0;
+    }
+
+    .success {
+      font-size: 1.5em;
+      color: #ff3366;
+      margin-top: 20px;
+      display: none;
     }
   </style>
 </head>
 <body>
 
-  <h1>The Chemistry of Love</h1>
+  <h1>The Chemistry of Love 💖</h1>
+  <p>Drag the elements into the correct order</p>
 
-  <div class="elements">
-    <div class="element"><strong>Li</strong><br><small>Lithium</small></div>
-    <div class="element"><strong>O</strong><br><small>Oxygen</small></div>
-    <div class="element"><strong>V</strong><br><small>Vanadium</small></div>
+  <div class="elements" id="elements">
+    <div class="card" draggable="true" data-symbol="Li">Li</div>
+    <div class="card" draggable="true" data-symbol="V">V</div>
+    <div class="card" draggable="true" data-symbol="E">E</div>
+    <div class="card" draggable="true" data-symbol="O">O</div>
   </div>
 
-  <button onclick="revealLove()">Combine Elements</button>
+  <div class="slots" id="slots">
+    <div class="slot" data-index="0"></div>
+    <div class="slot" data-index="1"></div>
+    <div class="slot" data-index="2"></div>
+    <div class="slot" data-index="3"></div>
+  </div>
 
-  <div id="result" class="reveal">💘 You just formed... <strong>LiOV → LOVE</strong></div>
+  <div class="success" id="success">You found the right chemistry! 💘</div>
 
   <script>
-    function revealLove() {
-      document.getElementById("result").classList.add("show");
+    const cards = document.querySelectorAll('.card');
+    const slots = document.querySelectorAll('.slot');
+    let dragged;
+
+    cards.forEach(card => {
+      card.addEventListener('dragstart', (e) => {
+        dragged = card;
+      });
+    });
+
+    slots.forEach(slot => {
+      slot.addEventListener('dragover', (e) => {
+        e.preventDefault();
+      });
+
+      slot.addEventListener('drop', (e) => {
+        if (!slot.hasChildNodes()) {
+          slot.appendChild(dragged);
+          slot.classList.add('filled');
+          checkAnswer();
+        }
+      });
+    });
+
+    function checkAnswer() {
+      const correct = ['Li', 'O', 'V', 'E'];
+      let result = [];
+
+      slots.forEach(slot => {
+        const symbol = slot.firstChild?.dataset.symbol;
+        result.push(symbol || '');
+      });
+
+      if (JSON.stringify(result) === JSON.stringify(correct)) {
+        document.getElementById('success').style.display = 'block';
+      } else {
+        document.getElementById('success').style.display = 'none';
+      }
     }
   </script>
-
 </body>
 </html>
