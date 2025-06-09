@@ -2,162 +2,151 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Chemistry Puzzle</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #fefefe;
+      font-family: sans-serif;
       padding: 20px;
+      background-color: #f5f5f5;
       text-align: center;
     }
-
-    h1, p {
-      color: #333;
+    h2 {
+      margin-bottom: 10px;
     }
-
-    #periodic-table {
+    .periodic-table {
       display: grid;
-      grid-template-columns: repeat(9, 60px);
+      grid-template-columns: repeat(10, 60px);
       gap: 10px;
       justify-content: center;
-      margin-bottom: 30px;
+      margin: 20px 0;
     }
-
     .element {
-      background-color: #e0f0ff;
-      border: 1px solid #aaa;
-      border-radius: 6px;
+      background: #ddd;
+      border-radius: 8px;
       padding: 10px;
-      font-size: 0.9em;
       cursor: grab;
-      text-align: center;
+      user-select: none;
+      font-weight: bold;
     }
-
-    .element:hover {
-      background-color: #d0eaff;
+    .element.dragging {
+      opacity: 0.5;
     }
-
-    .slots {
+    .drop-zone {
       display: flex;
-      gap: 10px;
       justify-content: center;
-      margin-bottom: 20px;
+      gap: 10px;
+      margin-top: 30px;
     }
-
     .slot {
       width: 60px;
       height: 60px;
-      background-color: #f0f0f0;
+      background: #eee;
       border: 2px dashed #bbb;
-      border-radius: 6px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
     }
-
-    .slot.filled {
-      background-color: #d0ffd0;
-      border-style: solid;
-    }
-
-    #success {
-      display: none;
-      font-size: 1.3em;
-      color: #4caf50;
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
-  <h1>🧪 Find and order these elements:</h1>
-  <p><strong>Lithium, Oxygen, Vanadium, Einsteinium</strong></p>
+  <h2>Find and order this element:</h2>
+  <p><strong>Lithium, Oxygen, Vanadium</strong></p>
 
-  <div id="periodic-table" ondragover="event.preventDefault()" ondrop="dropToTable(event)">
-    <!-- Elements inserted by JS -->
+  <div class="periodic-table" id="table">
+    <div class="element" draggable="true" data-symbol="Li">Li</div>
+    <div class="element" draggable="true" data-symbol="O">O</div>
+    <div class="element" draggable="true" data-symbol="V">V</div>
+    <div class="element" draggable="true" data-symbol="Na">Na</div>
+    <div class="element" draggable="true" data-symbol="H">H</div>
+    <div class="element" draggable="true" data-symbol="He">He</div>
+    <div class="element" draggable="true" data-symbol="C">C</div>
+    <div class="element" draggable="true" data-symbol="Fe">Fe</div>
+    <div class="element" draggable="true" data-symbol="N">N</div>
+    <div class="element" draggable="true" data-symbol="K">K</div>
   </div>
 
-  <div class="slots" id="slots">
-    <div class="slot"></div>
+  <div class="drop-zone" id="slots">
     <div class="slot"></div>
     <div class="slot"></div>
     <div class="slot"></div>
   </div>
 
-  <div id="success">❤️ You discovered the chemistry of LOVE!</div>
+  <button onclick="checkAnswer()">Check</button>
+  <p id="result"></p>
 
   <script>
-    const elementList = [
-      { symbol: "H", name: "Hydrogen" },
-      { symbol: "He", name: "Helium" },
-      { symbol: "Li", name: "Lithium" },
-      { symbol: "Be", name: "Beryllium" },
-      { symbol: "B", name: "Boron" },
-      { symbol: "C", name: "Carbon" },
-      { symbol: "N", name: "Nitrogen" },
-      { symbol: "O", name: "Oxygen" },
-      { symbol: "F", name: "Fluorine" },
-      { symbol: "Ne", name: "Neon" },
-      { symbol: "Na", name: "Sodium" },
-      { symbol: "Mg", name: "Magnesium" },
-      { symbol: "Al", name: "Aluminium" },
-      { symbol: "Si", name: "Silicon" },
-      { symbol: "P", name: "Phosphorus" },
-      { symbol: "S", name: "Sulfur" },
-      { symbol: "Cl", name: "Chlorine" },
-      { symbol: "Ar", name: "Argon" },
-      { symbol: "K", name: "Potassium" },
-      { symbol: "Ca", name: "Calcium" },
-      { symbol: "V", name: "Vanadium" },
-      { symbol: "E", name: "Einsteinium*" } // Fictitious E for fun
-    ];
-
-    const table = document.getElementById('periodic-table');
-    const slots = document.querySelectorAll('.slot');
     let dragged;
 
-    elementList.forEach(elem => {
-      const div = document.createElement('div');
-      div.className = 'element';
-      div.draggable = true;
-      div.dataset.symbol = elem.symbol;
-      div.innerHTML = `<strong>${elem.symbol}</strong><br><small>${elem.name}</small>`;
-      div.addEventListener('dragstart', (e) => {
-        dragged = div;
+    document.querySelectorAll('.element').forEach(elem => {
+      elem.addEventListener('dragstart', e => {
+        dragged = e.target;
+        dragged.classList.add('dragging');
       });
-      table.appendChild(div);
+
+      elem.addEventListener('dragend', () => {
+        dragged.classList.remove('dragging');
+      });
     });
 
-    slots.forEach(slot => {
-      slot.addEventListener('dragover', (e) => e.preventDefault());
-      slot.addEventListener('drop', (e) => {
+    document.querySelectorAll('.slot').forEach(slot => {
+      slot.addEventListener('dragover', e => {
         e.preventDefault();
-        if (slot.firstChild) {
-          table.appendChild(slot.firstChild); // return old element
+      });
+
+      slot.addEventListener('drop', e => {
+        e.preventDefault();
+        if (dragged) {
+          // If there's already a symbol inside, return it to table
+          const existing = slot.textContent.trim();
+          if (existing) {
+            const returnEl = document.createElement('div');
+            returnEl.className = 'element';
+            returnEl.draggable = true;
+            returnEl.dataset.symbol = existing;
+            returnEl.textContent = existing;
+            addElementDragEvents(returnEl);
+            document.getElementById('table').appendChild(returnEl);
+          }
+
+          slot.textContent = dragged.dataset.symbol;
+          dragged.remove();
         }
-        slot.appendChild(dragged);
-        updateSlotStyles();
-        checkAnswer();
       });
     });
 
-    function dropToTable(e) {
-      e.preventDefault();
-      if (dragged.parentElement.classList.contains('slot')) {
-        dragged.parentElement.classList.remove('filled');
-      }
-      table.appendChild(dragged);
-      updateSlotStyles();
-      checkAnswer();
-    }
+    function addElementDragEvents(el) {
+      el.addEventListener('dragstart', e => {
+        dragged = e.target;
+        dragged.classList.add('dragging');
+      });
 
-    function updateSlotStyles() {
-      slots.forEach(slot => {
-        slot.classList.toggle('filled', slot.hasChildNodes());
+      el.addEventListener('dragend', () => {
+        dragged.classList.remove('dragging');
       });
     }
 
     function checkAnswer() {
-      const correct = ['Li', 'O', 'V', 'E'];
-      const result = Array.from(slots).map(slot => slot.firstChild?.dataset.symbol || '');
-      document.getElementById('success').style.display = JSON.stringify(result) === JSON.stringify(correct)
-        ? 'block' : 'none';
+      const slots = document.querySelectorAll('.slot');
+      const result = document.getElementById('result');
+      const correct = ['Li', 'O', 'V'];
+      const user = Array.from(slots).map(s => s.textContent.trim());
+
+      if (JSON.stringify(user) === JSON.stringify(correct)) {
+        result.textContent = ' yeee ketemu chemistry of 💖, semangat Araaa besok,semoga dilancarkan, dan dimudahkan aamiin';
+        result.style.color = 'green';
+      } else {
+        result.textContent = 'Hmm… coba lagii pasti bisaaa nih';
+        result.style.color = 'red';
+      }
     }
   </script>
 </body>
