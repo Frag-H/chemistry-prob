@@ -59,7 +59,7 @@
 </head>
 <body>
   <h2>Find and order this element:</h2>
-  <p><strong>Lithium, Oxygen, Vanadium</strong></p>
+  <p><strong>Einsteinium, Lithium, Oxygen, Vanadium</strong></p>
 
   <div class="periodic-table" id="table">
     <div class="element" draggable="true" data-symbol="Li">Li</div>
@@ -72,9 +72,11 @@
     <div class="element" draggable="true" data-symbol="Fe">Fe</div>
     <div class="element" draggable="true" data-symbol="N">N</div>
     <div class="element" draggable="true" data-symbol="K">K</div>
+    <div class="element" draggable="true" data-symbol="Es">Es</div>
   </div>
 
   <div class="drop-zone" id="slots">
+    <div class="slot"></div>
     <div class="slot"></div>
     <div class="slot"></div>
     <div class="slot"></div>
@@ -137,14 +139,14 @@
     function checkAnswer() {
       const slots = document.querySelectorAll('.slot');
       const result = document.getElementById('result');
-      const correct = ['Li', 'O', 'V'];
+      const correct = ['Li', 'O', 'V', 'Es'];
       const user = Array.from(slots).map(s => s.textContent.trim());
 
       if (JSON.stringify(user) === JSON.stringify(correct)) {
-        result.textContent = ' yeee ketemu chemistry of 💖, semangat Araaa besok,semoga dilancarkan, dan dimudahkan aamiin';
+        result.textContent = ' yeee ketemu chemistry of 💖, semangat Araaa besok,semoga dilancarkan, dan dimudahkan yaa aamiin 👊';
         result.style.color = 'green';
       } else {
-        result.textContent = 'Hmm… coba lagii pasti bisaaa nih';
+        result.textContent = 'Hmm… coba lagii pasti bisaaa niih ✌️';
         result.style.color = 'red';
       }
     }
